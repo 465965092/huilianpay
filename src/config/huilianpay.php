@@ -7,7 +7,10 @@
  */
 
 return [
-    'mchid' => '',
-    'public_key' => '',
-    'private_key' => '',
+    'appid' => '',// 汇联appid
+    'IsvOrgId' => '',// 机构号
+    'mchid' => '', // 商户号
+    'publicKey' => '',// 汇联公钥
+    'privateKey' => '',// 商户私钥
+    'RsaType' => '01',
 ];

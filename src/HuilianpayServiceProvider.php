@@ -14,11 +14,11 @@ class HuilianpayServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        $this->loadViewsFrom(__DIR__ . '/views', 'Huilianpay'); // 视图目录指定
-        $this->publishes([
-             __DIR__.'/views' => base_path('resources/views/vendor/huilianpay'),  // 发布视图目录到resources 下
-            __DIR__.'/config/huilianpay.php' => config_path('huilianpay.php'), // 发布配置文件到 laravel 的config 下
-         ]);
+        if (!file_exists(config_path('huilianpay.php'))) {
+            $this->publishes([
+                (__DIR__) . '/config/huilianpay.php' => config_path('huilianpay.php'),
+            ], 'config');
+        }
     }
 
     /**
@@ -28,9 +28,12 @@ class HuilianpayServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(
+            (__DIR__) . '/config/huilianpay.php', 'huilianpay'
+        );
         //// 单例绑定服务
         $this->app->singleton('huilianpay', function ($app) {
-            return new Huilianpay($app['session'], $app['config']);
+            return new Huilianpay($app['config']);
          });
     }
 

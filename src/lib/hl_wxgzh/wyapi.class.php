@@ -10,25 +10,28 @@ class wyapi{
     public $privateKey = '';
     public $publicKey;
     public $IsvOrgId = "";
+    public $appid = "";
     public $gateUrl='https://open.huilianpay.com/pay';
 
-    function __construct($privateKey='',$publicKey=''){
+    function __construct($config){
         $this->xml=new Xml();
+        $this->IsvOrgId = $config['IsvOrgId'];
+        $this->publicKey = empty($config['publicKey']) ? "" : $config['publicKey'];
+        $this->privateKey = empty($config['privateKey']) ? "" : $config['privateKey'];
+        $this->ProviderType = empty($config['privateKey']) ? "01" : $config['privateKey'];
+        $this->RsaType = empty($config['RsaType']) ? "01" : $config['RsaType'];
+        $this->appid = empty($config['appid']) ? "" : $config['appid'];
+
         $this->head=array(
             'Version'=>'1.0.0',
-            'Appid'=>'',
+            'Appid'=>$this->appid,
             'ReqTime'=>date('Y-m-d H:i:s.275'),//2019-04-23 20:32:53.275
             'ReqTimeZone'=>'UTC+8',
             'ReqMsgId'=>$this->getRandomString(),
-            //'ReqMsgId'=>"9e9c2321-6304-4e3d-a6bf-aa".rand(1000,9999)."2869af",
-            'RsaType' => "01",
-//            'SignType'=>'RSA',
+            'RsaType' => $this->RsaType,
             'ProviderType'=>'01',
             'InputCharset'=>'UTF-8',
         );
-        $this->publicKey = $publicKey;
-		var_dump(11111);exit;
-//        $this->privateKey = $privateKey;
     }
 
 
@@ -58,10 +61,9 @@ class wyapi{
         $data+=array(
             'Currency'=>'CNY',
             'DeviceCreateIp'=>"127.0.0.1",
-            'ChannelType'=>'WX',
             'SettleType'=>'T1',
             //'RsaType' => "02",
-            'ProviderType'=>'01',
+            'ProviderType'=>$this->ProviderType,
             'IsvOrgId'=>$this->IsvOrgId,
         );
 
@@ -82,6 +84,41 @@ class wyapi{
         return array('status'=>0,'msg'=>$ret['ResultCode'].' | '.$ret['ResultMsg']);
     }
 
+    public function submitAppOrder($data){
+        $this->head['Function']='ant.mybank.bkmerchanttrade.intendpay';
+        $data+=array(
+            'HlMerchantId'=>$this->HlMerchantId,
+            'Currency'=>'CNY',
+            'DeviceCreateIp'=>"127.0.0.1",
+            'SettleType'=>'T1',
+            //'RsaType' => "02",
+            'ProviderType'=>'01',
+            'IsvOrgId'=>$this->IsvOrgId,
+        );
+
+        if($data['ChannelType'] == 'WX'){
+            $data['SubAppId'] = 'wx880b26b0f57e096d';
+        }
+
+
+        $resultXml=$this->submit($data);
+        $this->log('submitOrderResult',$resultXml);
+
+        $objectxml = (array)simplexml_load_string($resultXml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $jsonStr = json_encode($objectxml);
+        $ret2 = json_decode($jsonStr,true);
+
+        $ret=$ret2['response']['body']['RespInfo'];
+
+        if($ret['ResultStatus']=='true' || $ret['ResultStatus']=='S'){
+            if($this->verify($resultXml)){
+                $PayUid=$ret2['response']['body']['PayUid'];
+                return array('status'=>1,'PayUid'=>$PayUid);
+            }
+        }
+        return array('status'=>0,'msg'=>$ret['ResultCode'].' | '.$ret['ResultMsg']);
+    }
+
 
     public function submitOrder2($data){
         $this->head['Function']='ant.mybank.bkmerchanttrade.prePay';
@@ -91,7 +128,7 @@ class wyapi{
             'ChannelType'=>'WX',
             'SettleType'=>'T1',
             //'RsaType' => "02",
-            'ProviderType'=>'01',
+            'ProviderType'=>$this->ProviderType,
             'IsvOrgId'=>$this->IsvOrgId,
         );
 
