@@ -2,6 +2,9 @@
     "name": "denghr/huilianpay",
     "require": {},
     "autoload": {
+		"classmap": [
+            "database"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Denghr\\Huilianpay\\": "packages/denghr/huilianpay/src/"
