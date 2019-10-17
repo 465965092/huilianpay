@@ -2,6 +2,7 @@
 namespace Denghr\Huilianpay;
 use Illuminate\Session\SessionManager;
 use Illuminate\Config\Repository;
+require_once "lib\hl_wxgzh\wyapi.class.php";
 class Huilianpay
 {
     /**
@@ -12,6 +13,8 @@ class Huilianpay
      * @var Repository
      */
     protected $config;
+
+    protected $wyapi;
     /**
      * Packagetest constructor.
      * @param SessionManager $session
@@ -21,6 +24,7 @@ class Huilianpay
     {
         $this->session = $session;
         $this->config = $config;
+        $this->wyapi = new \wyapi();
     }
     /**
      * @param string $msg
