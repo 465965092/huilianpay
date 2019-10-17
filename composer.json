@@ -1,0 +1,10 @@
+{
+    "name": "denghr/huilianpay",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Denghr\\Huilianpay\\": "packages/denghr/huilianpay/src/"
+        }
+    }
+}
