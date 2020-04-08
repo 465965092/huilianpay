@@ -266,8 +266,8 @@ class wyapi{
                 $content .= $i2.": ".$k." = ".$v."\n";
             }
         }
-
-        file_put_contents(dirname(__FILE__)."/lllog/".date("Ymd").".log",$content,FILE_APPEND);
+        $path = storage_path()."/logs/";
+        file_put_contents($path."huilian_".date("Ymd").".log",$content,FILE_APPEND);
 
     }
 }
